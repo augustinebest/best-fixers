@@ -37,7 +37,7 @@ exports.signup = (req, res, next) => {
                                                         email: req.body.email,
                                                         password: hash,
                                                         phoneNumber: req.body.phoneNumber
-                                                    };
+                                                    }; 
                                                     User.create(user, (err, result) => {
                                                         if (err) return res.status(303).json({ err: err })
                                                         res.json({ message: 'This user have been added successfully!', code: 18 });
@@ -98,4 +98,8 @@ exports.userProfile = (req, res, next) => {
     } catch(error) {
         res.json({message: error, code: 16});
     }
+}
+
+exports.makeRequest = (req, res, next) => {
+    // res.json('make request')
 }
