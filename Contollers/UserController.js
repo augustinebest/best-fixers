@@ -80,6 +80,22 @@ exports.login = (req, res, next) => {
             })
         }
     } catch (error) {
-        res.json({ error: error, code: 15 });
+        res.json({ message: error, code: 15 });
+    }
+}
+
+exports.userProfile = (req, res, next) => {
+    const userId = req.params.id;
+    try {
+        User.findById(userId, '-password').exec((err, user) => {
+            if(err) return res.json({message: 'This user does not exist'});
+            if(!user) {
+                return res.json({message: 'Error ocurred in finding this user'});
+            }else {
+                res.json({message: 'User\'s profile' , user: user});
+            }
+        })
+    } catch(error) {
+        res.json({message: error, code: 16});
     }
 }
