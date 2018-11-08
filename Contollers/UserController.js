@@ -56,10 +56,30 @@ exports.signup = (req, res, next) => {
 
         }
     } catch (error) {
-        res.json({ error: error, code: 18 });
+        res.json({ error: error, code: 19 });
     }
 }
 
 exports.login = (req, res, next) => {
-    res.json('Yay');
+    try {
+        if (req.body.email == '' || req.body.email == null || req.body.password == '' || req.body.password == null) {
+            return res.json({ message: 'The field(s) are required!', code: 10 });
+        } else {
+            User.findOne({ email: req.body.email }).exec((err, user) => {
+                if (err) return res.json({ message: 'Error in finding this user', code: 11 });
+                if (!user) {
+                    return res.json({ message: 'This user does not exist', code: 12 });
+                } else {
+                    const checkPassword = bcrypt.compareSync(req.body.password, user.password);
+                    if (!checkPassword) {
+                        res.json({ message: 'email or password invalid!', code: 13 });
+                    } else {
+                        res.json({ message: 'You have logged in succesfully', code: 14, token: { id: user._id, name: user.name, email: user.email, number: user.phoneNumber } })
+                    }
+                }
+            })
+        }
+    } catch (error) {
+        res.json({ error: error, code: 15 });
+    }
 }
