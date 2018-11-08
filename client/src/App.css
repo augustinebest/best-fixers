@@ -1,0 +1,124 @@
+
+* {
+    font-family: Raleway
+}
+
+.App-logo {
+animation: App-logo-spin infinite 20s linear;
+height: 80px;
+}
+
+
+.App-header {
+    /* 000c18 020a1b*/
+    background-color: #120416;
+    padding: 15px 0 15px 15px;
+    color: white;
+    height: 70px
+}
+
+.genreHead{
+    line-height: 4.3em;
+    height: 60px;
+    padding-left: 30px;
+    background-color: #ececec;
+    margin-bottom: 30px
+}
+
+.App-title {
+font-size: 1.3em;
+}
+
+.App-Head {
+    font-size: 2em;
+    line-height: 1em;
+    margin-top: 7px
+}
+
+
+.App-intro {
+font-size: large;
+}
+
+
+@keyframes App-logo-spin {
+from { transform: rotate(0deg); }
+to { transform: rotate(360deg); }
+}
+
+
+.card {
+    box-shadow: 2px 4px 16px 2px rgba(0,0,0,0.4);
+    border-radius: 4px;
+}
+
+
+.bookshelf > div {
+    height: 360px;
+    margin: auto;
+    width: 21%;
+    margin-bottom: 30px;
+}
+
+
+.cardImage {
+    height: 80%;
+    width: 100%;
+    border-bottom: 1px solid darkgrey;
+}
+
+
+.cardName {
+    height: 20%;
+    width: 100%;
+    padding: 10px;
+}
+
+
+.bookshelf {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: baseline;
+    width: 90%;
+    height: auto;
+    margin-bottom: 40px;
+    margin-left:6%;
+    margin:auto;
+}
+
+.Artisan-Reg {
+    margin: 40px auto auto auto;
+    width: 60%;
+    /* align-content: center; */
+    /* justify-content: center; */
+    margin-bottom: 50px;
+}
+
+.Artisan-Reg-Form > input, textarea {
+    height: 40px;
+    width: 100%;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid darkgrey;
+    padding-left: 10px;
+}
+
+.ArtisanImage {
+    height: 190px;
+    width: 60%;
+    border: 1px solid darkgrey;
+    margin: auto;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+.Artisan-Reg-Form {
+    width: 100%;
+    display: inline;
+    align-content: center;
+}
+
+input[type=file] {
+    padding-top: 8px;
+    margin-bottom: 20px;
+}
