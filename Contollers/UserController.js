@@ -87,7 +87,7 @@ exports.login = (req, res, next) => {
 exports.userProfile = (req, res, next) => {
     const userId = req.params.id;
     try {
-        User.findById(userId, '-password').exec((err, user) => {
+        User.findById(userId, '-password -__v').exec((err, user) => {
             if(err) return res.json({message: 'This user does not exist'});
             if(!user) {
                 return res.json({message: 'Error ocurred in finding this user'});
