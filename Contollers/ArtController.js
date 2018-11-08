@@ -33,13 +33,11 @@ exports.addArtisan = (req, res, next) => {
                         cloud.upload(artisan.image).then(result => {
                             artisan.image = result.url;
                             artisan.imageID = result.Id;
-                            console.log(artisan);
                             Artisan.create(artisan, (err, result) => {
                                 if(err) return res.json({message: err, code: 14})
                                 if(result) {
                                     res.json({message: 'this artisan have been created', code: 15})
                                 }
-                                console.log('from result', result);
                             })
                         })
                     }
