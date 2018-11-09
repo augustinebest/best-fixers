@@ -1,5 +1,7 @@
 const User = require('../Models/User');
+const Admin = require('../Models/Admin');
 const bcrypt = require('bcrypt');
+const Request = require('../Models/Request');
 
 exports.signup = (req, res, next) => {
     try {
@@ -37,7 +39,7 @@ exports.signup = (req, res, next) => {
                                                         email: req.body.email,
                                                         password: hash,
                                                         phoneNumber: req.body.phoneNumber
-                                                    }; 
+                                                    };
                                                     User.create(user, (err, result) => {
                                                         if (err) return res.status(303).json({ err: err })
                                                         res.json({ message: 'This user have been added successfully!', code: 18 });
@@ -88,18 +90,51 @@ exports.userProfile = (req, res, next) => {
     const userId = req.params.id;
     try {
         User.findById(userId, '-password -__v').exec((err, user) => {
-            if(err) return res.json({message: 'This user does not exist'});
-            if(!user) {
-                return res.json({message: 'Error ocurred in finding this user'});
-            }else {
-                res.json({message: 'User\'s profile' , user: user});
+            if (err) return res.json({ message: 'This user does not exist' });
+            if (!user) {
+                return res.json({ message: 'Error ocurred in finding this user' });
+            } else {
+                res.json({ message: 'User\'s profile', user: user });
             }
         })
-    } catch(error) {
-        res.json({message: error, code: 16});
+    } catch (error) {
+        res.json({ message: error, code: 16 });
     }
 }
 
 exports.makeRequest = (req, res, next) => {
-    // res.json('make request')
+    const userId = req.params.id;
+    const request = {
+        jobCategory: req.body.jobCategory,
+        jobDescription: req.body.jobDescription,
+        address: req.body.address,
+        dateDone: req.body.dateDone,
+        userId: userId
+    }
+    try {
+        User.findOne({ _id: userId }, '-password -__v').exec((err, user) => {
+            if (err) return res.json({ message: 'This user does not exist', code: 10 });
+            if (!user) {
+                return res.json({ message: 'Error ocurred in finding this user', code: 11 });
+            } else {
+                Admin.findOne({username: 'best',}, '-password -__v -rejectedRequest -confirmRequest').exec((err, admin) => {
+                    if(err) return res.json({message: 'This admin does not exist', code: 12});
+                    if(admin) {
+                        Request.create(request, (err, result) => {
+                            if(err) return res.json({message: 'Error ocurred in adding this request', code: 13});
+                            if(result) {
+                                const check = admin.userRequest.push(result._id);
+                                admin.save();
+                                if(check) {
+                                    res.json({message: 'Your request will be matched with an artisan', code: 14})
+                                }
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    } catch (error) {
+        res.json({ message: error, code: 16 });
+    }
 }

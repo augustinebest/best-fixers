@@ -36,7 +36,7 @@ exports.addArtisan = (req, res, next) => {
                             Artisan.create(artisan, (err, result) => {
                                 if(err) return res.json({message: err, code: 14})
                                 if(result) {
-                                    res.json({message: 'this artisan have been created', code: 15})
+                                    res.json({message: 'We will get back to you after verification through your email', code: 15})
                                 }
                             })
                         })
