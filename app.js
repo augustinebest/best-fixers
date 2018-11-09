@@ -19,6 +19,7 @@ app.use((req, res, next) => {
 // Routes
 const UserRoutes = require('./routes/User');
 const ArtisanRoutes = require('./routes/Artisan');
+const AdminRoutes = require('./routes/Admin');
 
 //middleware
 app.use(bodyParser.json());
@@ -29,10 +30,10 @@ app.use(morgan('dev'));
 
 //connecting to mongoose
 mongoose.Promise = global.Promise;
-// mongoose.connect('mongodb://localhost:27017/Artisan', { useNewUrlParser: true })
+mongoose.connect('mongodb://localhost:27017/Artisan', { useNewUrlParser: true })
 
 // Connection to mlab
-mongoose.connect('mongodb://chotaapp:chota123@ds033484.mlab.com:33484/chota', { useNewUrlParser: true })
+// mongoose.connect('mongodb://chotaapp:chota123@ds033484.mlab.com:33484/chota', { useNewUrlParser: true })
 
 //route for homepage
 app.get('/', (req, res) => {
@@ -41,6 +42,7 @@ app.get('/', (req, res) => {
 
 app.use('/user', UserRoutes);
 app.use('/artisan', ArtisanRoutes);
+app.use('/admin', AdminRoutes);
 
 app.use((req, res, next) => {
     const error = new Error('Not Found');
