@@ -1,4 +1,5 @@
 const Admin = require('../Models/Admin');
+const Artisan = require('../Models/Artisan');
 const bcrypt = require('bcrypt');
 
 exports.signup = (req, res, next) => {
@@ -104,8 +105,20 @@ exports.getAllArtisansRequest = (req, res, next) => {
 }
 
 exports.verifyAnArtisan = (req, res, next) => {
+    const artisanId = req.params.id;
+    const newNum = 1;
     try {
-        res.json('verify an artisan');
+        Artisan.findById(artisanId).exec((err, artisan) => {
+            if(err) return res.json({ message: 'This artisan does not exist', code: 10 });
+            if(!artisan) {
+                return res.json({message: 'Error ocurred in finding this artisans', code: 11});
+            }
+            const check = artisan.verified = newNum;
+            if(check) {
+                artisan.save();
+                res.json({message: 'This artisan have been verified', code: 12});
+            }
+        })
     } catch(error) {
         res.json({ message: error, code: 15 });
     }
