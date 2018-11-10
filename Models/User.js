@@ -25,6 +25,9 @@ const userSchema = mongoose.Schema({
     status: {
         type: String,
         default: 'User'
+    },
+    requestlogs: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Request' }]
     }
 });
 

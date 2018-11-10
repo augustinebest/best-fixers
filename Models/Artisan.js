@@ -11,7 +11,7 @@ const artisanSchema = mongoose.Schema({
     },
     email: {
         type: String,
-        unique: true,
+        // unique: true,
         require: true,
         match: /[a-zs0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
     },
@@ -53,6 +53,9 @@ const artisanSchema = mongoose.Schema({
     verified: {
         type: Number,
         default: 0
+    },
+    requestNotifications: {
+        type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Request' }]
     }
 });
 

@@ -5,5 +5,6 @@ const upload = require('../Services/image_uploads');
 
 
 router.post('/addArtisan', upload.upload.single('image'), artisanController.addArtisan);
+router.post('/:id/profile', artisanController.artisanProfile);
 
 module.exports = router;

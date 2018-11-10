@@ -2,6 +2,7 @@ const User = require('../Models/User');
 const Admin = require('../Models/Admin');
 const bcrypt = require('bcrypt');
 const Request = require('../Models/Request');
+const Artisan = require('../Models/Artisan');
 
 exports.signup = (req, res, next) => {
     try {
@@ -76,7 +77,7 @@ exports.login = (req, res, next) => {
                     if (!checkPassword) {
                         res.json({ message: 'email or password invalid!', code: 13 });
                     } else {
-                        res.json({ message: 'You have logged in succesfully', code: 14, token: { id: user._id, name: user.name, email: user.email, number: user.phoneNumber } })
+                        res.json({ message: 'You have logged in succesfully', code: 14, token: { id: user._id, name: user.name, email: user.email, number: user.phoneNumber, flag: 'user' } })
                     }
                 }
             })
@@ -123,11 +124,24 @@ exports.makeRequest = (req, res, next) => {
                         Request.create(request, (err, result) => {
                             if(err) return res.json({message: 'Error ocurred in adding this request', code: 13});
                             if(result) {
-                                const check = admin.userRequest.push(result._id);
-                                admin.save();
-                                if(check) {
-                                    res.json({message: 'Your request will be matched with an artisan', code: 14})
-                                }
+                                    Artisan.find().exec((err, artisan) => {
+                                        if(err) return res.json({message: 'Error ocurred in finding artisans', code: 14});
+                                        var art = artisan;
+                                        art.map(element => {
+                                            if(element.specialization == req.body.jobCategory) {
+                                                const check1 = element.requestNotifications.push(result._id);
+                                                if(check1) {
+                                                    element.save();
+                                                }
+                                            }
+                                        })
+                                        const check = admin.userRequest.push(result._id);
+                                        if(check) {
+                                            admin.save();
+                                            res.json({message: 'Your request will be matched with an artisan', code: 15})
+                                        }
+
+                                    })
                             }
                         })
                     }
