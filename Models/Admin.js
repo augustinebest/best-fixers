@@ -9,9 +9,18 @@ const adminSchema = mongoose.Schema({
         type: String,
         require: true
     },
-    userRequest: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Request' }],
-    confirmRequest: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-    rejectedRequest: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+    artisanRequest: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'Artisan'
+    }],
+    userRequest: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'Request'
+    }],
+    confirmRequest: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'User'
+    }],
+    rejectedRequest: [{
+        type: mongoose.Schema.Types.ObjectId, ref: 'User'
+    }]
 });
 
 module.exports = mongoose.model('Admin', adminSchema);
