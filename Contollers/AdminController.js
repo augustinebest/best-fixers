@@ -88,3 +88,24 @@ exports.getAllRequests = (req, res, next) => {
         res.json({ message: error, code: 15 });
     }
 }
+
+exports.getAllArtisansRequest = (req, res, next) => {
+    try {
+        Admin.find().select('artisanRequest').populate('artisanRequest').exec((err, artisans) => {
+            if(err) return res.json({ message: 'Error ocurred in getting all artisans', code: 10 });
+            if(artisans) {
+                res.json({message: `You have ${artisans.length} artisans currently applied`, artisans: artisans, code: 11});
+            }
+        })
+    } catch(error) {
+        res.json({ message: error, code: 15 });
+    }
+}
+
+exports.verifyAnArtisan = (req, res, next) => {
+    try {
+        res.json('verify an artisan');
+    } catch(error) {
+        res.json({ message: error, code: 15 });
+    }
+}
