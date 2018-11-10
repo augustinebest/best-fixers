@@ -30,10 +30,10 @@ app.use(morgan('dev'));
 
 //connecting to mongoose
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/Artisan', { useNewUrlParser: true })
+// mongoose.connect('mongodb://localhost:27017/Artisan', { useNewUrlParser: true })
 
 // Connection to mlab
-// mongoose.connect('mongodb://chotaapp:chota123@ds033484.mlab.com:33484/chota', { useNewUrlParser: true })
+mongoose.connect('mongodb://chotaapp:chota123@ds033484.mlab.com:33484/chota', { useNewUrlParser: true })
 
 //route for homepage
 app.get('/', (req, res) => {
