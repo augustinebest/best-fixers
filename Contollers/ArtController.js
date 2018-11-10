@@ -1,5 +1,6 @@
 const Artisan = require('../Models/Artisan');
 const cloud = require('../Services/cloudinary');
+const Admin = require('../Models/Admin');
 
 exports.addArtisan = (req, res, next) => {
     // console.log(req.file);
@@ -33,10 +34,19 @@ exports.addArtisan = (req, res, next) => {
                         cloud.upload(artisan.image).then(result => {
                             artisan.image = result.url;
                             artisan.imageID = result.Id;
-                            Artisan.create(artisan, (err, result) => {
-                                if (err) return res.json({ message: err, code: 14 })
-                                if (result) {
-                                    res.json({ message: 'We will get back to you after verification through your email', code: 15 })
+                            Admin.findOne({ username: 'best' }, '-password -__v -rejectedRequest -confirmRequest').exec((err, output) => {
+                                if (err) return res.json({ message: 'This admin does not exist' });
+                                if (output) {
+                                    Artisan.create(artisan, (err, result) => {
+                                        if (err) return res.json({ message: err, code: 14 })
+                                        if (result) {
+                                            const check = output.artisanRequest.push(result._id);
+                                            if(check) {
+                                                output.save();
+                                                res.json({ message: 'We will get back to you after verification through your email', code: 15 })
+                                            }
+                                        }
+                                    })
                                 }
                             })
                         })
