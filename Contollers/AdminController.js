@@ -94,7 +94,8 @@ exports.getAllArtisansRequest = (req, res, next) => {
         Admin.find().select('artisanRequest').populate('artisanRequest').exec((err, artisans) => {
             if(err) return res.json({ message: 'Error ocurred in getting all artisans', code: 10 });
             if(artisans) {
-                res.json({message: `You have ${artisans.length} artisans currently applied`, artisans: artisans, code: 11});
+                console.log(artisans)
+                res.json({message: `You have ${artisans[0].artisanRequest.length} artisans currently applied`, artisans: artisans, code: 11});
             }
         })
     } catch(error) {
