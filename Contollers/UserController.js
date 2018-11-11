@@ -90,7 +90,10 @@ exports.login = (req, res, next) => {
 exports.userProfile = (req, res, next) => {
     const userId = req.params.id;
     try {
-        User.findById(userId, '-password -__v').exec((err, user) => {
+        User.findById(userId, '-password -__v').populate({
+            path: 'requestlogs',
+            select: 'dateOfRequest jobCategory jobDescription address dateDone userId'
+        }).exec((err, user) => {
             if (err) return res.json({ message: 'This user does not exist' });
             if (!user) {
                 return res.json({ message: 'Error ocurred in finding this user' });
@@ -118,30 +121,32 @@ exports.makeRequest = (req, res, next) => {
             if (!user) {
                 return res.json({ message: 'Error ocurred in finding this user', code: 11 });
             } else {
-                Admin.findOne({username: 'best',}, '-password -__v -rejectedRequest -confirmRequest').exec((err, admin) => {
-                    if(err) return res.json({message: 'This admin does not exist', code: 12});
-                    if(admin) {
+                Admin.findOne({ username: 'best', }, '-password -__v -rejectedRequest -confirmRequest').exec((err, admin) => {
+                    if (err) return res.json({ message: 'This admin does not exist', code: 12 });
+                    if (admin) {
                         Request.create(request, (err, result) => {
-                            if(err) return res.json({message: 'Error ocurred in adding this request', code: 13});
-                            if(result) {
-                                    Artisan.find().exec((err, artisan) => {
-                                        if(err) return res.json({message: 'Error ocurred in finding artisans', code: 14});
-                                        var art = artisan;
-                                        art.map(element => {
-                                            if(element.specialization == req.body.jobCategory) {
-                                                const check1 = element.requestNotifications.push(result._id);
-                                                if(check1) {
-                                                    element.save();
-                                                }
+                            if (err) return res.json({ message: 'Error ocurred in adding this request', code: 13 });
+                            if (result) {
+                                Artisan.find().exec((err, artisan) => {
+                                    if (err) return res.json({ message: 'Error ocurred in finding artisans', code: 14 });
+                                    var art = artisan;
+                                    art.map(element => {
+                                        if (element.specialization == req.body.jobCategory) {
+                                            const check1 = element.requestNotifications.push(result._id);
+                                            if (check1) {
+                                                element.save();
                                             }
-                                        })
-                                        const check = admin.userRequest.push(result._id);
-                                        if(check) {
-                                            admin.save();
-                                            res.json({message: 'Your request will be matched with an artisan', code: 15})
                                         }
-
                                     })
+                                    const check = admin.userRequest.push(result._id);
+                                    const check2 = user.requestlogs.push(result._id);
+                                    if (check && check2) {
+                                        admin.save();
+                                        user.save();
+                                        res.json({ message: 'Your request will be matched with an artisan', code: 15 })
+                                    }
+
+                                })
                             }
                         })
                     }

@@ -11,7 +11,7 @@ const artisanSchema = mongoose.Schema({
     },
     email: {
         type: String,
-        // unique: true,
+        unique: false,
         require: true,
         match: /[a-zs0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/
     },
