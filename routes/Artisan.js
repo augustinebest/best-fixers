@@ -6,5 +6,7 @@ const upload = require('../Services/image_uploads');
 
 router.post('/addArtisan', upload.upload.single('image'), artisanController.addArtisan);
 router.post('/:id/profile', artisanController.artisanProfile);
+router.post('/:id/accept', artisanController.acceptRequest);
+router.post(`/auth/set-password`, artisanController.setPassword);
 
 module.exports = router;

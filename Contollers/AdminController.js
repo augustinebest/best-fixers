@@ -1,74 +1,7 @@
 const Admin = require('../Models/Admin');
 const Artisan = require('../Models/Artisan');
 const bcrypt = require('bcrypt');
-
-exports.signup = (req, res, next) => {
-
-    try {
-        if (req.body.username == '' || req.body.username == null || req.body.password == '' || req.body.password == null || req.body.confirmPassword == '' || req.body.confirmPassword == null) {
-            return res.json({ messsage: 'The field(s) are required', code: 10 });
-        } else {
-            Admin.findOne({ username: req.body.username }).exec((err, result) => {
-                if (err) res.json({ messsage: err, code: 11 });
-                if (result) {
-                    return res.json({ messsage: 'This admin already exist', code: 12 });
-                } else {
-                    if (req.body.username.length < 3) {
-                        return res.json({ messsage: 'The username should contain of at least 4 characters', code: 13 });
-                    } else {
-                        if (req.body.password.length < 6) {
-                            return res.json({ messsage: 'The password should contain of at least 6 characters', code: 14 });
-                        } else {
-                            if (req.body.password != req.body.confirmPassword) {
-                                return res.json({ messsage: 'The password does not match', code: 15 });
-                            } else {
-                                bcrypt.hash(req.body.password, 10, (err, hash) => {
-                                    if (err) res.json(err);
-                                    else {
-                                        const admin = new Admin({
-                                            username: req.body.username,
-                                            password: hash
-                                        })
-                                        Admin.create(admin, (err, result) => {
-                                            if (err) return res.json({ err: err })
-                                            res.json({ message: 'This Admin have been added successfully!', code: 16 });
-                                        })
-                                    }
-                                })
-                            }
-                        }
-                    }
-                }
-            })
-        }
-    } catch (error) {
-        res.json({ messsage: error, code: 15 })
-    }
-}
-
-exports.login = (req, res, next) => {
-    try {
-        if (req.body.username == '' || req.body.username == null || req.body.password == '' || req.body.password == null) {
-            return res.json({ message: 'The field(s) are required!', code: 10 });
-        } else {
-            Admin.findOne({ username: req.body.username }).exec((err, user) => {
-                if (err) return res.json({ message: 'Error in finding this Admin', code: 11 });
-                if (!user) {
-                    return res.json({ message: 'This Admin does not exist', code: 12 });
-                } else {
-                    const checkPassword = bcrypt.compareSync(req.body.password, user.password);
-                    if (!checkPassword) {
-                        res.json({ message: 'username or password invalid!', code: 13 });
-                    } else {
-                        res.json({ message: 'You have logged in succesfully as an admin', code: 14, token: { id: user._id } })
-                    }
-                }
-            })
-        }
-    } catch (error) {
-        res.json({ message: error, code: 15 });
-    }
-}
+const mailer = require('../Services/mailer');
 
 exports.getAllRequests = (req, res, next) => {
     try {
@@ -82,7 +15,14 @@ exports.getAllRequests = (req, res, next) => {
         }).exec((err, allRequest) => {
             if (err) return res.json({ message: 'Error in finding this Admin', code: 11 });
             if (allRequest) {
-                res.json({usersRequest: allRequest[0].userRequest, code: 12});
+                const sortedRequest = allRequest[0].userRequest.sort((a, b) => {
+                    if (a.dateOfRequest > b.dateOfRequest) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                })
+                res.json({ usersRequest: sortedRequest, code: 12 });
             }
         })
     } catch (error) {
@@ -93,13 +33,13 @@ exports.getAllRequests = (req, res, next) => {
 exports.getAllArtisansRequest = (req, res, next) => {
     try {
         Admin.find().select('artisanRequest').populate('artisanRequest').exec((err, artisans) => {
-            if(err) return res.json({ message: 'Error ocurred in getting all artisans', code: 10 });
-            if(artisans) {
+            if (err) return res.json({ message: 'Error ocurred in getting all artisans', code: 10 });
+            if (artisans) {
                 console.log(artisans)
-                res.json({message: `You have ${artisans[0].artisanRequest.length} artisans currently applied`, artisans: artisans, code: 11});
+                res.json({ message: `You have ${artisans[0].artisanRequest.length} artisans currently applied`, artisans: artisans, code: 11 });
             }
         })
-    } catch(error) {
+    } catch (error) {
         res.json({ message: error, code: 15 });
     }
 }
@@ -109,17 +49,20 @@ exports.verifyAnArtisan = (req, res, next) => {
     const newNum = 1;
     try {
         Artisan.findById(artisanId).exec((err, artisan) => {
-            if(err) return res.json({ message: 'This artisan does not exist', code: 10 });
-            if(!artisan) {
-                return res.json({message: 'Error ocurred in finding this artisans', code: 11});
+            if (err) return res.json({ message: 'This artisan does not exist', code: 10 });
+            if (!artisan) {
+                return res.json({ message: 'Error ocurred in finding this artisans', code: 11 });
             }
-            const check = artisan.verified = newNum;
-            if(check) {
-                artisan.save();
-                res.json({message: 'This artisan have been verified', code: 12});
-            }
+                mailer.verify(artisan._id, artisan.email, (err, info) => {
+                    if (err) res.json({ message: 'Error ocurred while sending mail', err: err, code: 12 });
+                    else {
+                        artisan.verified = newNum;
+                        artisan.save();
+                        res.json({ message: 'This artisan have been verified', code: 13 });
+                    }
+                })
         })
-    } catch(error) {
+    } catch (error) {
         res.json({ message: error, code: 15 });
     }
 }

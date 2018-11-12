@@ -23,6 +23,10 @@ const requestSchema = mongoose.Schema({
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId, ref: 'User'
+    },
+    status: {
+        type: Number,
+        default: 0
     }
 });
 

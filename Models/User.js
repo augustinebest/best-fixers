@@ -22,9 +22,9 @@ const userSchema = mongoose.Schema({
         type: Number,
         require: true,
     },
-    status: {
-        type: String,
-        default: 'User'
+    flag: {
+        type: Number,
+        default: 0
     },
     requestlogs: {
         type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Request' }]

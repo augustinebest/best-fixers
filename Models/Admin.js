@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const adminSchema = mongoose.Schema({
-    username: {
+    email: {
         type: String,
         require: true
     },
@@ -20,7 +20,11 @@ const adminSchema = mongoose.Schema({
     }],
     rejectedRequest: [{
         type: mongoose.Schema.Types.ObjectId, ref: 'User'
-    }]
+    }],
+    flag: {
+        type: Number,
+        default: 2
+    }
 });
 
 module.exports = mongoose.model('Admin', adminSchema);
