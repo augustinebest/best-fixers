@@ -136,17 +136,9 @@ exports.setPassword = (req, res, next) => {
                         bcrypt.hash(req.body.password, 10, (err, hash) => {
                             if (err) res.json(err);
                             else {
-                                const pass = {
-                                    password: hash
-                                };
-                                Artisan.create(pass, (err, result) => {
-                                    if (err) return res.json({ err: err })
-                                    if (result) {
-                                        artisan.password = hash;
-                                        artisan.save();
-                                        res.json({ message: 'Your password have been set, you can proceed to login', code: 15 });
-                                    }
-                                })
+                                artisan.password = hash;
+                                artisan.save();
+                                res.json({ message: 'Your password have been set, you can proceed to login', code: 15 });
                             }
                         })
                     })
@@ -156,5 +148,4 @@ exports.setPassword = (req, res, next) => {
     } catch (error) {
         res.json({ message: error, code: 18 })
     }
-    console.log(artisanId, artisanEmail)
 }
