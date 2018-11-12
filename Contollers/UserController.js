@@ -70,28 +70,36 @@ exports.login = (req, res, next) => {
             User.findOne({ email: req.body.email }).exec((err, user) => {
                 if (err) return res.json({ message: 'Error ocurred in finding this User', code: 11 });
                 Artisan.findOne({ email: req.body.email }).exec((err, artisan) => {
-                    if (err) return res.json({ message: 'Error ocurred in finding this Artisan', code: 13 });
+                    if (err) return res.json({ message: 'Error ocurred in finding this Artisan', code: 12 });
                     Admin.findOne({ email: req.body.email }).exec((err, admin) => {
-                        if (err) return res.json({ message: 'Error ocurred in finding this Admin', code: 14 });
+                        if (err) return res.json({ message: 'Error ocurred in finding this Admin', code: 13 });
                         // Checking for User
                         if (user) {
                             if (user.flag == 0) {
                                 const checkPassword = bcrypt.compareSync(req.body.password, user.password);
                                 if (!checkPassword) {
-                                    res.json({ message: 'email or password invalid!', code: 13 });
+                                    res.json({ message: 'email or password invalid!', code: 14 });
                                 } else {
-                                    res.json({ message: 'You have logged in succesfully', code: 14, token: { id: user._id, flag: 0 } })
+                                    res.json({ message: 'You have logged in succesfully', code: 15, token: { id: user._id, email: user.email, number: user.phoneNumber, flag: 0 } })
                                 }
                             }
                         } else {
                             // Checking for Artisan
                             if (artisan) {
                                 if (artisan.flag == 1) {
-                                    const checkPassword = bcrypt.compareSync(req.body.password, artisan.password);
-                                    if (!checkPassword) {
-                                        res.json({ message: 'email or password invalid!', code: 13 });
+                                    if (artisan.verified == 0) {
+                                        return res.json({ message: 'Your account have not been verified', code: 16 })
                                     } else {
-                                        res.json({ message: 'You have logged in succesfully', code: 14, token: { id: artisan._id, flag: 1 } })
+                                        if (artisan.password == null) {
+                                            return res.json({ message: 'There is no password set for this account', code: 17 })
+                                        } else {
+                                            const checkPassword = bcrypt.compareSync(req.body.password, artisan.password);
+                                            if (!checkPassword) {
+                                                res.json({ message: 'email or password invalid!', code: 18 });
+                                            } else {
+                                                res.json({ message: 'You have logged in succesfully', code: 19, token: { id: artisan._id, email: artisan.email, number: artisan.phoneNumber, flag: 1 } })
+                                            }
+                                        }
                                     }
                                 }
                             } else {
@@ -100,13 +108,13 @@ exports.login = (req, res, next) => {
                                     if (admin.flag == 2) {
                                         const checkPassword = bcrypt.compareSync(req.body.password, admin.password);
                                         if (!checkPassword) {
-                                            res.json({ message: 'email or password invalid!', code: 13 });
+                                            res.json({ message: 'email or password invalid!', code: 20 });
                                         } else {
-                                            res.json({ message: 'You have logged in succesfully as an Admin', code: 14, token: { id: admin._id, flag: 2 } })
+                                            res.json({ message: 'You have logged in succesfully as an Admin', code: 21, token: { id: admin._id, email: admin.email, flag: 2 } })
                                         }
                                     }
                                 } else {
-                                    return res.json({ message: 'This account does not exist', code: 20 })
+                                    return res.json({ message: 'This account does not exist', code: 22 })
                                 }
                             }
                         }
@@ -115,7 +123,7 @@ exports.login = (req, res, next) => {
             })
         }
     } catch (error) {
-        res.json({ message: error, code: 21 });
+        res.json({ message: error, code: 23 });
     }
 }
 
