@@ -80,7 +80,7 @@ exports.login = (req, res, next) => {
                                 if (!checkPassword) {
                                     res.json({ message: 'email or password invalid!', code: 14 });
                                 } else {
-                                    res.json({ message: 'You have logged in succesfully', code: 15, token: { id: user._id, email: user.email, number: user.phoneNumber, flag: 0 } })
+                                    res.json({ message: 'You have logged in succesfully', code: 15, token: { id: user._id, email: user.email, number: user.phoneNumber, flag: user.flag } })
                                 }
                             }
                         } else {
@@ -97,7 +97,7 @@ exports.login = (req, res, next) => {
                                             if (!checkPassword) {
                                                 res.json({ message: 'email or password invalid!', code: 18 });
                                             } else {
-                                                res.json({ message: 'You have logged in succesfully', code: 19, token: { id: artisan._id, email: artisan.email, number: artisan.phoneNumber, flag: 1 } })
+                                                res.json({ message: 'You have logged in succesfully', code: 19, token: { id: artisan._id, email: artisan.email, number: artisan.phoneNumber, flag: artisan.flag } })
                                             }
                                         }
                                     }
@@ -110,7 +110,7 @@ exports.login = (req, res, next) => {
                                         if (!checkPassword) {
                                             res.json({ message: 'email or password invalid!', code: 20 });
                                         } else {
-                                            res.json({ message: 'You have logged in succesfully as an Admin', code: 21, token: { id: admin._id, email: admin.email, flag: 2 } })
+                                            res.json({ message: 'You have logged in succesfully as an Admin', code: 21, token: { id: admin._id, email: admin.email, flag: admin.flag } })
                                         }
                                     }
                                 } else {

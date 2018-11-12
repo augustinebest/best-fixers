@@ -129,9 +129,9 @@ exports.setPassword = (req, res, next) => {
                     return res.json({ message: 'Password do not match', code: 12 });
                 } else {
                     Artisan.findOne({ _id: artisanId }).exec((err, artisan) => {
-                        if (err) return res.json({ message: 'This Artisan does not exist', code: 11 });
+                        if (err) return res.json({ message: 'This Artisan does not exist', code: 13 });
                         if (!artisan) {
-                            return res.json({ message: 'Error ocurred in finding this request', code: 12 });
+                            return res.json({ message: 'Error ocurred in finding this request', code: 14 });
                         }
                         bcrypt.hash(req.body.password, 10, (err, hash) => {
                             if (err) res.json(err);
@@ -144,7 +144,7 @@ exports.setPassword = (req, res, next) => {
                                     if (result) {
                                         artisan.password = hash;
                                         artisan.save();
-                                        res.json({ message: 'Your password have been set, you can proceed to login', code: 13 });
+                                        res.json({ message: 'Your password have been set, you can proceed to login', code: 15 });
                                     }
                                 })
                             }

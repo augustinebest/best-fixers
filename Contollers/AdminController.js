@@ -1,6 +1,6 @@
 const Admin = require('../Models/Admin');
 const Artisan = require('../Models/Artisan');
-const bcrypt = require('bcrypt');
+const User = require('../Models/User');
 const mailer = require('../Services/mailer');
 
 exports.getAllRequests = (req, res, next) => {
@@ -35,7 +35,6 @@ exports.getAllArtisansRequest = (req, res, next) => {
         Admin.find().select('artisanRequest').populate('artisanRequest').exec((err, artisans) => {
             if (err) return res.json({ message: 'Error ocurred in getting all artisans', code: 10 });
             if (artisans) {
-                console.log(artisans)
                 res.json({ message: `You have ${artisans[0].artisanRequest.length} artisans currently applied`, artisans: artisans, code: 11 });
             }
         })
@@ -61,6 +60,20 @@ exports.verifyAnArtisan = (req, res, next) => {
                         res.json({ message: 'This artisan have been verified', code: 13 });
                     }
                 })
+        })
+    } catch (error) {
+        res.json({ message: error, code: 15 });
+    }
+}
+
+exports.getAllUsers = (req, res, next) => {
+    try {
+        User.find().exec((err, users) => {
+            if(err) return res.json({message: 'There is no user currently', code: 10});
+            if(!users) {
+                return res.json({message: 'Error ocurred in finding this artisans', code: 11});
+            }
+            res.json({message: `There are ${users.length} users currently`, users: users, code: 12});
         })
     } catch (error) {
         res.json({ message: error, code: 15 });
