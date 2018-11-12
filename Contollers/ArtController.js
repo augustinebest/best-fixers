@@ -40,26 +40,28 @@ exports.addArtisan = (req, res, next) => {
                                 if (err) return res.json({ message: 'Error ocurred in getting this atisan', code: 15 });
                                 if (artisan) {
                                     return res.json({ message: 'This email already exist', code: 16 });
-                                }
-                                cloud.upload(artisan1.image).then(result => {
-                                    artisan1.image = result.url;
-                                    artisan1.imageID = result.Id;
-                                    Admin.findOne({ email: 'best@gmail.com' }, '-password -__v -rejectedRequest -confirmRequest').exec((err, output) => {
-                                        if (err) return res.json({ message: 'This admin does not exist', code: 17 });
-                                        if (output) {
-                                            Artisan.create(artisan1, (err, result) => {
-                                                if (err) return res.json({ message: err, code: 18 })
-                                                if (result) {
-                                                    const check = output.artisanRequest.push(result._id);
-                                                    if (check) {
-                                                        output.save();
-                                                        res.json({ message: 'We will get back to you after verification through your email', code: 19 })
+                                } else {
+                                    cloud.upload(artisan1.image).then(result => {
+                                        artisan1.image = result.url;
+                                        artisan1.imageID = result.Id;
+                                        Admin.findOne({ email: 'best@gmail.com' }, '-password -__v -rejectedRequest -confirmRequest').exec((err, output) => {
+                                            if (err) return res.json({ message: 'This admin does not exist', code: 17 });
+                                            if (output) {
+                                                Artisan.create(artisan1, (err, result) => {
+                                                    if (err) return res.json({ message: err, code: 18 })
+                                                    if (result) {
+                                                        const check = output.artisanRequest.push(result._id);
+                                                        if (check) {
+                                                            output.save();
+                                                            res.json({ message: 'We will get back to you after verification through your email', code: 19 })
+                                                        }
                                                     }
-                                                }
-                                            })
-                                        }
+                                                })
+                                            }
+                                        })
                                     })
-                                })
+                                }
+
                             })
                         }
                     }
