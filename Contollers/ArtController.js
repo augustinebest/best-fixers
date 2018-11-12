@@ -34,26 +34,26 @@ exports.addArtisan = (req, res, next) => {
                         return res.json({ message: 'Second guarantors number should contain at least 4 characters', code: 13 });
                     } else {
                         if (req.file.size > 5242880) {
-                            return res.json({ message: 'You can\'t upload file greater than 5MB', code: 13 });
+                            return res.json({ message: 'You can\'t upload file greater than 5MB', code: 14 });
                         } else {
                             Artisan.findOne({ email: req.body.email }).exec((err, artisan) => {
-                                if (err) return res.json({ message: 'Error ocurred in getting this atisan', code: 14 });
+                                if (err) return res.json({ message: 'Error ocurred in getting this atisan', code: 15 });
                                 if (artisan) {
-                                    return res.json({ message: 'This email already exist', code: 15 });
+                                    return res.json({ message: 'This email already exist', code: 16 });
                                 }
                                 cloud.upload(artisan1.image).then(result => {
                                     artisan1.image = result.url;
                                     artisan1.imageID = result.Id;
                                     Admin.findOne({ email: 'best@gmail.com' }, '-password -__v -rejectedRequest -confirmRequest').exec((err, output) => {
-                                        if (err) return res.json({ message: 'This admin does not exist' });
+                                        if (err) return res.json({ message: 'This admin does not exist', code: 17 });
                                         if (output) {
                                             Artisan.create(artisan1, (err, result) => {
-                                                if (err) return res.json({ message: err, code: 16 })
+                                                if (err) return res.json({ message: err, code: 18 })
                                                 if (result) {
                                                     const check = output.artisanRequest.push(result._id);
                                                     if (check) {
                                                         output.save();
-                                                        res.json({ message: 'We will get back to you after verification through your email', code: 17 })
+                                                        res.json({ message: 'We will get back to you after verification through your email', code: 19 })
                                                     }
                                                 }
                                             })
@@ -67,30 +67,29 @@ exports.addArtisan = (req, res, next) => {
             }
         }
     } catch (error) {
-        res.json({ message: error, code: 18 })
+        res.json({ message: error, code: 20 })
     }
 }
 
 exports.artisanProfile = (req, res, next) => {
     const artisanId = req.params.id;
     try {
-
+        Artisan.findOne({ _id: artisanId }).populate({
+            path: 'requestNotifications',
+            populate: {
+                path: 'userId',
+                select: 'firstName lastName email phoneNumber'
+            }
+        }).exec((err, artisan) => {
+            if (err) return res.json({ message: 'This artisan does not exist', code: 10 });
+            if (!artisan) {
+                return res.json({ message: 'Error ocurred in finding this artisan', code: 11 })
+            }
+            res.json({ message: artisan, code: 12 });
+        })
     } catch (error) {
-        res.json({ message: error, code: 18 })
+        res.json({ message: error, code: 13 })
     }
-    Artisan.findOne({ _id: artisanId }).populate({
-        path: 'requestNotifications',
-        populate: {
-            path: 'userId',
-            select: 'firstName lastName email phoneNumber'
-        }
-    }).exec((err, artisan) => {
-        if (err) return res.json({ message: 'This artisan does not exist', code: 10 });
-        if (!artisan) {
-            return res.json({ message: 'Error ocurred in finding this artisan', code: 11 })
-        }
-        res.json({ message: artisan, code: 12 });
-    })
 }
 
 exports.acceptRequest = (req, res, next) => {
