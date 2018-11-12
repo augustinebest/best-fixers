@@ -45,7 +45,6 @@ exports.signup = (req, res, next) => {
                                                         if (err) return res.status(303).json({ err: err })
                                                         res.json({ message: 'This user have been added successfully!', code: 18 });
                                                     })
-                                                    // console.log(user)
                                                 }
                                             })
                                         }
@@ -69,21 +68,54 @@ exports.login = (req, res, next) => {
             return res.json({ message: 'The field(s) are required!', code: 10 });
         } else {
             User.findOne({ email: req.body.email }).exec((err, user) => {
-                if (err) return res.json({ message: 'Error in finding this user', code: 11 });
-                if (!user) {
-                    return res.json({ message: 'This user does not exist', code: 12 });
-                } else {
-                    const checkPassword = bcrypt.compareSync(req.body.password, user.password);
-                    if (!checkPassword) {
-                        res.json({ message: 'email or password invalid!', code: 13 });
-                    } else {
-                        res.json({ message: 'You have logged in succesfully', code: 14, token: { id: user._id, name: user.name, email: user.email, number: user.phoneNumber, flag: 'user' } })
-                    }
-                }
+                if (err) return res.json({ message: 'Error ocurred in finding this User', code: 11 });
+                Artisan.findOne({ email: req.body.email }).exec((err, artisan) => {
+                    if (err) return res.json({ message: 'Error ocurred in finding this Artisan', code: 13 });
+                    Admin.findOne({ email: req.body.email }).exec((err, admin) => {
+                        if (err) return res.json({ message: 'Error ocurred in finding this Admin', code: 14 });
+                        // Checking for User
+                        if (user) {
+                            if (user.flag == 0) {
+                                const checkPassword = bcrypt.compareSync(req.body.password, user.password);
+                                if (!checkPassword) {
+                                    res.json({ message: 'email or password invalid!', code: 13 });
+                                } else {
+                                    res.json({ message: 'You have logged in succesfully', code: 14, token: { id: user._id, flag: 0 } })
+                                }
+                            }
+                        } else {
+                            // Checking for Artisan
+                            if (artisan) {
+                                if (artisan.flag == 1) {
+                                    const checkPassword = bcrypt.compareSync(req.body.password, artisan.password);
+                                    if (!checkPassword) {
+                                        res.json({ message: 'email or password invalid!', code: 13 });
+                                    } else {
+                                        res.json({ message: 'You have logged in succesfully', code: 14, token: { id: artisan._id, flag: 1 } })
+                                    }
+                                }
+                            } else {
+                                // Checking for Admin
+                                if (admin) {
+                                    if (admin.flag == 2) {
+                                        const checkPassword = bcrypt.compareSync(req.body.password, admin.password);
+                                        if (!checkPassword) {
+                                            res.json({ message: 'email or password invalid!', code: 13 });
+                                        } else {
+                                            res.json({ message: 'You have logged in succesfully as an Admin', code: 14, token: { id: admin._id, flag: 2 } })
+                                        }
+                                    }
+                                } else {
+                                    return res.json({ message: 'This account does not exist', code: 20 })
+                                }
+                            }
+                        }
+                    })
+                })
             })
         }
     } catch (error) {
-        res.json({ message: error, code: 15 });
+        res.json({ message: error, code: 21 });
     }
 }
 
@@ -121,7 +153,7 @@ exports.makeRequest = (req, res, next) => {
             if (!user) {
                 return res.json({ message: 'Error ocurred in finding this user', code: 11 });
             } else {
-                Admin.findOne({ username: 'best', }, '-password -__v -rejectedRequest -confirmRequest').exec((err, admin) => {
+                Admin.findOne({ email: 'best@gmail.com', }, '-password -__v -rejectedRequest -confirmRequest').exec((err, admin) => {
                     if (err) return res.json({ message: 'This admin does not exist', code: 12 });
                     if (admin) {
                         Request.create(request, (err, result) => {
