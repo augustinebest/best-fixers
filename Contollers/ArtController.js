@@ -5,7 +5,6 @@ const Request = require('../Models/Request');
 const bcrypt = require('bcrypt');
 
 exports.addArtisan = (req, res, next) => {
-    console.log(req.file);
     const artisan1 = new Artisan({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
