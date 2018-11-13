@@ -2,6 +2,7 @@ const Artisan = require('../Models/Artisan');
 const cloud = require('../Services/cloudinary');
 const Admin = require('../Models/Admin');
 const Request = require('../Models/Request');
+const User = require('../Models/User');
 const bcrypt = require('bcrypt');
 
 exports.addArtisan = (req, res, next) => {
@@ -38,30 +39,32 @@ exports.addArtisan = (req, res, next) => {
                         } else {
                             Artisan.findOne({ email: req.body.email }).exec((err, artisan) => {
                                 if (err) return res.json({ message: 'Error ocurred in getting this atisan', code: 15 });
-                                if (artisan) {
-                                    return res.json({ message: 'This email already exist', code: 16 });
-                                } else {
-                                    cloud.upload(artisan1.image).then(result => {
-                                        artisan1.image = result.url;
-                                        artisan1.imageID = result.Id;
-                                        Admin.findOne({ email: 'best@gmail.com' }, '-password -__v -rejectedRequest -confirmRequest').exec((err, output) => {
-                                            if (err) return res.json({ message: 'This admin does not exist', code: 17 });
-                                            if (output) {
-                                                Artisan.create(artisan1, (err, result) => {
-                                                    if (err) return res.json({ message: err, code: 18 })
-                                                    if (result) {
-                                                        const check = output.artisanRequest.push(result._id);
-                                                        if (check) {
-                                                            output.save();
-                                                            res.json({ message: 'We will get back to you after verification through your email', code: 19 })
+                                User.findOne({ email: req.body.email }).exec((err, user) => {
+                                    if (err) return res.json({ message: 'Error ocurred in getting this user', code: 21 });
+                                    if (artisan || user) {
+                                        return res.json({ message: 'This email already exist', code: 16 });
+                                    } else {
+                                        cloud.upload(artisan1.image).then(result => {
+                                            artisan1.image = result.url;
+                                            artisan1.imageID = result.Id;
+                                            Admin.findOne({ email: 'best@gmail.com' }, '-password -__v -rejectedRequest -confirmRequest').exec((err, output) => {
+                                                if (err) return res.json({ message: 'This admin does not exist', code: 17 });
+                                                if (output) {
+                                                    Artisan.create(artisan1, (err, result) => {
+                                                        if (err) return res.json({ message: err, code: 18 })
+                                                        if (result) {
+                                                            const check = output.artisanRequest.push(result._id);
+                                                            if (check) {
+                                                                output.save();
+                                                                res.json({ message: 'We will get back to you after verification through your email', code: 19 })
+                                                            }
                                                         }
-                                                    }
-                                                })
-                                            }
+                                                    })
+                                                }
+                                            })
                                         })
-                                    })
-                                }
-
+                                    }
+                                })
                             })
                         }
                     }
