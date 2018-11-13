@@ -10,50 +10,49 @@ exports.signup = (req, res, next) => {
             return res.json({ message: 'The field(s) are required', code: 10 });
         } else {
             User.findOne({ email: req.body.email }).exec((err, user) => {
-                if (err) {
-                    return res.json({ message: 'Error ocurred in finding this user', code: 11 });
-                } else {
-                    if (user) {
+                if (err) return res.json({ message: 'Error ocurred in finding this user', code: 11 });
+                Artisan.findOne({ email: req.body.email }).exec((err, artisan) => {
+                    if (err) return res.json({ message: 'Error ocurred in finding this artisan', code: 11 });
+                    if (user || artisan) {
                         return res.json({ message: 'The user already exist', code: 12 });
+                    }
+                    if (req.body.firstName.length < 3) {
+                        return res.json({ message: 'The first name should contain at least 3 characters', code: 13 });
                     } else {
-                        if (req.body.firstName.length < 3) {
-                            return res.json({ message: 'The first name should contain at least 3 characters', code: 13 });
+                        if (req.body.lastName.length < 3) {
+                            return res.json({ message: 'The last name should contain at least 3 characters', code: 14 });
                         } else {
-                            if (req.body.lastName.length < 3) {
-                                return res.json({ message: 'The last name should contain at least 3 characters', code: 14 });
+                            if (req.body.phoneNumber.length < 4) {
+                                return res.json({ message: 'The phone number should contain at least 4 characters', code: 15 });
                             } else {
-                                if (req.body.phoneNumber.length < 4) {
-                                    return res.json({ message: 'The phone number should contain at least 4 characters', code: 15 });
+                                if (req.body.password.length < 6) {
+                                    return res.json({ message: 'The password should contain at least 6 characters', code: 16 });
                                 } else {
-                                    if (req.body.password.length < 6) {
-                                        return res.json({ message: 'The password should contain at least 6 characters', code: 16 });
+                                    if (req.body.password != req.body.confirmPassword) {
+                                        return res.json({ message: 'The password does not match', code: 17 });
                                     } else {
-                                        if (req.body.password != req.body.confirmPassword) {
-                                            return res.json({ message: 'The password does not match', code: 17 });
-                                        } else {
-                                            bcrypt.hash(req.body.password, 10, (err, hash) => {
-                                                if (err) res.json(err);
-                                                else {
-                                                    const user = {
-                                                        firstName: req.body.firstName,
-                                                        lastName: req.body.lastName,
-                                                        email: req.body.email,
-                                                        password: hash,
-                                                        phoneNumber: req.body.phoneNumber
-                                                    };
-                                                    User.create(user, (err, result) => {
-                                                        if (err) return res.status(303).json({ err: err })
-                                                        res.json({ message: 'This user have been added successfully!', code: 18 });
-                                                    })
-                                                }
-                                            })
-                                        }
+                                        bcrypt.hash(req.body.password, 10, (err, hash) => {
+                                            if (err) res.json(err);
+                                            else {
+                                                const user = {
+                                                    firstName: req.body.firstName,
+                                                    lastName: req.body.lastName,
+                                                    email: req.body.email,
+                                                    password: hash,
+                                                    phoneNumber: req.body.phoneNumber
+                                                };
+                                                User.create(user, (err, result) => {
+                                                    if (err) return res.status(303).json({ err: err })
+                                                    res.json({ message: 'This user have been added successfully!', code: 18 });
+                                                })
+                                            }
+                                        })
                                     }
                                 }
                             }
                         }
                     }
-                }
+                })
             })
 
         }
