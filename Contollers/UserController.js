@@ -12,7 +12,7 @@ exports.signup = (req, res, next) => {
             User.findOne({ email: req.body.email }).exec((err, user) => {
                 if (err) return res.json({ message: 'Error ocurred in finding this user', code: 11 });
                 Artisan.findOne({ email: req.body.email }).exec((err, artisan) => {
-                    if (err) return res.json({ message: 'Error ocurred in finding this artisan', code: 11 });
+                    if (err) return res.json({ message: 'Error ocurred in finding this artisan', code: 20 });
                     if (user || artisan) {
                         return res.json({ message: 'The user already exist', code: 12 });
                     }
