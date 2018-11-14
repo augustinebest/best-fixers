@@ -8,6 +8,6 @@ router.post('/:id/verify/', adminController.verifyAnArtisan);
 router.get('/allUsers', adminController.getAllUsers);
 router.post('/addSpecialization', adminController.addSpecialization);
 router.get('/getAllSpecialization', adminController.getAllSpecialization);
-// router.delete('/deleteASpecialization', adminController.deleteSpecialization);
+router.delete('/deleteASpecialization', adminController.deleteSpecialization);
 
 module.exports = router;

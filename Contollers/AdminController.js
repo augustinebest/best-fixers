@@ -121,20 +121,20 @@ exports.getAllSpecialization = (req, res, next) => {
     }
 }
 
-// exports.deleteSpecialization = (req, res, next) => {
-//     const specializationID = req.body.specializationID
-//     try {
-//         Specialization.find({ specialization: specializationID }).exec((err, spec) => {
-//             if (err) return res.json({ message: 'Error ocurred in finding this specialization', code: 10 });
-//             if (!spec) {
-//                 return res.json({ message: 'There specialization does not exist', code: 11 });
-//             }
-//             Specialization.remove({ specialization: specializationID }).exec((err) => {
-//                 if (err) return res.json({ message: 'Error ocurred in deleting this specialization', code: 12 });
-//                 res.json({message: 'This specialization have been deleted', code: 13});
-//             })
-//         })
-//     } catch (error) {
-//         res.json({ message: error, code: 15 });
-//     }
-// }
+exports.deleteSpecialization = (req, res, next) => {
+    const specializationID = req.body.specializationID;
+    try {
+        Specialization.findById(specializationID).exec((err, spec) => {
+            if (err) return res.json({ message: 'Error ocurred in finding this specialization', code: 10 });
+            if (!spec) {
+                return res.json({ message: 'There specialization does not exist', code: 11 });
+            }
+            Specialization.remove({ _id: specializationID }).exec((err) => {
+                if (err) return res.json({ message: 'Error ocurred in deleting this specialization', code: 12 });
+                res.json({message: 'This specialization have been deleted', code: 13});
+            })
+        })
+    } catch (error) {
+        res.json({ message: error, code: 15 });
+    }
+}
