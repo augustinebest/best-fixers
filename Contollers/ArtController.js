@@ -81,6 +81,7 @@ exports.artisanProfile = (req, res, next) => {
     try {
         Artisan.findOne({ _id: artisanId }).populate({
             path: 'requestNotifications',
+            select: 'firstName lastName email phoneNumber address specialization image guarantor1Name guarantor1Number guarantor2Name guarantor2Number verified',
             populate: {
                 path: 'userId',
                 select: 'firstName lastName email phoneNumber'
