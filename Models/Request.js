@@ -27,6 +27,14 @@ const requestSchema = mongoose.Schema({
     status: {
         type: Number,
         default: 0
+    },
+    lat: {
+        type: String,
+        default: null
+    },
+    long: {
+        type: String,
+        default: null
     }
 });
 

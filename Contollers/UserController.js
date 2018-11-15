@@ -147,51 +147,93 @@ exports.userProfile = (req, res, next) => {
 
 exports.makeRequest = (req, res, next) => {
     const userId = req.params.id;
-    const request = {
+    const request = new Request({
         jobCategory: req.body.jobCategory,
         jobDescription: req.body.jobDescription,
         address: req.body.address,
         dateDone: req.body.dateDone,
-        userId: userId
-    }
+        userId: userId,
+        lat: req.body.lat,
+        long: req.body.long
+    })
     try {
-        User.findOne({ _id: userId }, '-password -__v').exec((err, user) => {
-            if (err) return res.json({ message: 'This user does not exist', code: 10 });
-            if (!user) {
-                return res.json({ message: 'Error ocurred in finding this user', code: 11 });
-            } else {
-                Admin.findOne({ email: 'best@gmail.com', }, '-password -__v -rejectedRequest -confirmRequest').exec((err, admin) => {
-                    if (err) return res.json({ message: 'This admin does not exist', code: 12 });
-                    if (admin) {
-                        Request.create(request, (err, result) => {
-                            if (err) return res.json({ message: 'Error ocurred in adding this request', code: 13 });
-                            if (result) {
-                                Artisan.find().exec((err, artisan) => {
-                                    if (err) return res.json({ message: 'Error ocurred in finding artisans', code: 14 });
-                                    var art = artisan;
-                                    art.map(element => {
-                                        if (element.specialization == req.body.jobCategory) {
-                                            const check1 = element.requestNotifications.push(result._id);
-                                            if (check1) {
-                                                element.save();
+        if (req.body.jobCategory == '' || req.body.jobCategory == null || req.body.jobDescription == '' || req.body.jobDescription == null || req.body.address == '' || req.body.address == null || req.body.dateDone == '' || req.body.dateDone == null) {
+            return res.json({ message: 'The field(s) are required', code: 17 });
+        } else {
+            User.findOne({ _id: userId }, '-password -__v').exec((err, user) => {
+                if (err) return res.json({ message: 'This user does not exist', code: 10 });
+                if (!user) {
+                    return res.json({ message: 'Error ocurred in finding this user', code: 11 });
+                } else {
+                    Admin.findOne({ email: 'best@gmail.com', }, '-password -__v -rejectedRequest -confirmRequest').exec((err, admin) => {
+                        if (err) return res.json({ message: 'This admin does not exist', code: 12 });
+                        if (admin) {
+                            Request.create(request, (err, result) => {
+                                if (err) return res.json({ message: 'Error ocurred in adding this request', code: 13 });
+                                if (result) {
+                                    Artisan.find().exec((err, artisan) => {
+                                        if (err) return res.json({ message: 'Error ocurred in finding artisans', code: 14 });
+                                        const requestOrigin = { 
+                                            id: result._id,
+                                            latX: result.lat,
+                                            longY: result.long
+                                        };
+                                        const availableArtisans = [];
+                                        const resultantArtisans = [];
+
+                                        for (var el of artisan) {
+                                            if (el.verified == 1 && el.lat != null || el.long != null) {
+                                                if(el.specialization == req.body.jobCategory) {
+                                                    const av = {
+                                                        artisanID: el._id,
+                                                        latX: el.lat,
+                                                        longY: el.long
+                                                    }
+                                                    availableArtisans.push(av);
+                                                }
                                             }
                                         }
-                                    })
-                                    const check = admin.userRequest.push(result._id);
-                                    const check2 = user.requestlogs.push(result._id);
-                                    if (check && check2) {
-                                        admin.save();
-                                        user.save();
-                                        res.json({ message: 'Your request will be matched with an artisan', code: 15 })
-                                    }
+                                        for(var x of availableArtisans) {
+                                            const avail = {
+                                                artisanID: x.artisanID,
+                                                D: Math.sqrt(Math.pow((parseFloat(x.latX) - parseFloat(requestOrigin.latX)), 2) + Math.pow((parseFloat(x.longY) - parseFloat(requestOrigin.longY)), 2))
+                                            }
+                                            resultantArtisans.push(avail);
+                                        }
+                                        const sortedArtisians = resultantArtisans.sort((a, b) => {
+                                            return a.D - b.D
+                                        })
+                                        const sendToArtisan = sortedArtisians.slice(0,5); // select five close artisans to the user
 
-                                })
-                            }
-                        })
-                    }
-                })
-            }
-        })
+                                        const p = sendToArtisan.map(q => {
+                                            return q.artisanID
+                                        })
+                                        Artisan.find({_id: p}).exec((err, art) => {
+                                            if(err) return res.json({message: 'Error ocurred in getting this artisan', code: 17});
+                                            if(!art) {
+                                                res.json({message: 'There is no artisan avai', code: 18})
+                                            }
+                                            const k = art.map(s => {
+                                                s.requestNotifications.push(result._id);
+                                                s.save();
+                                            })
+                                            const check2 = user.requestlogs.push(result._id);
+                                            const check3 = admin.userRequest.push(result._id);
+                                            if(check2 && check3) {
+                                                user.save();
+                                                admin.save();
+                                                res.json({message: 'Your request will be matched with an artisan', code: 15});
+                                            }
+                                        })
+
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        }
     } catch (error) {
         res.json({ message: error, code: 16 });
     }

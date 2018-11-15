@@ -18,7 +18,9 @@ exports.addArtisan = (req, res, next) => {
         guarantor1Name: req.body.guarantor1Name,
         guarantor1Number: req.body.guarantor1Number,
         guarantor2Name: req.body.guarantor2Name,
-        guarantor2Number: req.body.guarantor2Number
+        guarantor2Number: req.body.guarantor2Number,
+        lat: req.body.lat,
+        long: req.body.long
     })
     try {
         if (req.body.firstName == '' || req.body.firstName == null || req.body.lastName == '' || req.body.lastName == null || req.body.email == '' || req.body.email == null || req.body.phoneNumber == '' || req.body.phoneNumber == null || req.body.address == '' || req.body.address == null || req.body.specialization == '' || req.body.specialization == null || req.body.guarantor1Name == '' || req.body.guarantor1Name == null || req.body.guarantor1Number == '' || req.body.guarantor1Number == null || req.body.guarantor2Name == '' || req.body.guarantor2Name == null || req.body.guarantor2Number == '' || req.body.guarantor2Number == null) {
@@ -79,7 +81,7 @@ exports.addArtisan = (req, res, next) => {
 exports.artisanProfile = (req, res, next) => {
     const artisanId = req.params.id;
     try {
-        Artisan.findOne({ _id: artisanId }).populate({
+        Artisan.findOne({ _id: artisanId }, '-password -lat -long' ).populate({
             path: 'requestNotifications',
             select: 'firstName lastName email phoneNumber address specialization image guarantor1Name guarantor1Number guarantor2Name guarantor2Number verified',
             populate: {

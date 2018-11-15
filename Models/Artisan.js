@@ -64,6 +64,14 @@ const artisanSchema = mongoose.Schema({
     flag: {
         type: Number,
         default: 1
+    },
+    lat: {
+        type: String,
+        default: null
+    },
+    long: {
+        type: String,
+        default: null
     }
 });
 
