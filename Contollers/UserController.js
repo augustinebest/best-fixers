@@ -3,6 +3,7 @@ const Admin = require('../Models/Admin');
 const bcrypt = require('bcrypt');
 const Request = require('../Models/Request');
 const Artisan = require('../Models/Artisan');
+const Specialization = require('../Models/Specialization');
 
 exports.signup = (req, res, next) => {
     try {
@@ -131,7 +132,11 @@ exports.userProfile = (req, res, next) => {
     try {
         User.findById(userId, '-password -__v').populate({
             path: 'requestlogs',
-            select: 'dateOfRequest jobCategory jobDescription address dateDone userId'
+            select: 'dateOfRequest jobCategory jobDescription address dateDone userId',
+            populate: {
+                path: 'jobCategory',
+                select: 'specialization'
+            }
         }).exec((err, user) => {
             if (err) return res.json({ message: 'This user does not exist' });
             if (!user) {

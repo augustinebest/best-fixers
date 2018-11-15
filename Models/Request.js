@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const requestSchema = mongoose.Schema({
     jobCategory: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId, ref: 'Specialization',
         require: true
     },
     jobDescription: {
