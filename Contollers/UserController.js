@@ -132,7 +132,7 @@ exports.userProfile = (req, res, next) => {
     try {
         User.findById(userId, '-password -__v').populate({
             path: 'requestlogs',
-            select: 'dateOfRequest jobCategory jobDescription address dateDone userId',
+            select: 'dateOfRequest jobCategory jobDescription address dateDone userId status',
             populate: {
                 path: 'jobCategory',
                 select: 'specialization'
